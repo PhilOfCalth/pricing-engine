@@ -60,7 +60,7 @@ class DbConfig{
 
 @Configuration
 @Profile("sqlite")
-@PropertySource("classpath:persistence-sqlite.properties")
+@PropertySource("classpath:application.properties")
 class SqliteConfig
 
 @Configuration
