@@ -4,7 +4,7 @@ import org.hibernate.dialect.Dialect
 import org.hibernate.dialect.identity.IdentityColumnSupportImpl
 import java.sql.Types
 
-class SQLiteDialect(): Dialect() {
+class SQLiteDialect: Dialect() {
 
     init {
         registerColumnType(Types.BIT, "integer")

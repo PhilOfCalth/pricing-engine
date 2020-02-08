@@ -16,5 +16,4 @@ class Product(
     var wantedPrice: Int?,
     @Column(name="min_price", nullable = false)
     var minPrice: Int?
-){
-}
+)

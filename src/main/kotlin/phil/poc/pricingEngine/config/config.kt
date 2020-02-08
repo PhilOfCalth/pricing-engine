@@ -29,7 +29,7 @@ class DbConfig{
     @Bean
     fun dataSource(): DataSource{
         val dataSource = DriverManagerDataSource()
-        val driverClassNameVal: String = env.getProperty("driverClassName")
+        val driverClassNameVal: String = env.getProperty("driverClassName")?: ""
         dataSource.setDriverClassName(driverClassNameVal)
         dataSource.url = env.getProperty("url")
         dataSource.username = env.getProperty("user")
@@ -80,14 +80,14 @@ class RestConfig: RepositoryRestConfigurer{
 class ValidatorEventRegister : InitializingBean {
 
     @Autowired
-    internal var validatingRepositoryEventListener: ValidatingRepositoryEventListener? = null
+    internal lateinit var validatingRepositoryEventListener: ValidatingRepositoryEventListener
 
     @Autowired
-    private val validators: Map<String, Validator>? = null
+    private lateinit var validators: Map<String, Validator>
 
     @Throws(Exception::class)
     override fun afterPropertiesSet() {
-        val events = Arrays.asList(
+        val events = listOf(
             "beforeCreate",
             "afterCreate",
             "beforeSave",
@@ -98,9 +98,9 @@ class ValidatorEventRegister : InitializingBean {
             "afterDelete"
         )
 
-        for ((key, value) in validators!!) {
+        for ((key, value) in validators) {
             events.stream().filter { p -> key.startsWith(p) }.findFirst().ifPresent { p ->
-                validatingRepositoryEventListener!!.addValidator(p, value)
+                validatingRepositoryEventListener.addValidator(p, value)
             }
         }
     }
