@@ -1,5 +1,6 @@
 package phil.poc.pricingEngine.config
 
+import org.springframework.beans.factory.InitializingBean
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -8,10 +9,13 @@ import org.springframework.context.annotation.PropertySource
 import org.springframework.core.env.Environment
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories
 import org.springframework.data.rest.core.config.RepositoryRestConfiguration
+import org.springframework.data.rest.core.event.ValidatingRepositoryEventListener
 import org.springframework.data.rest.webmvc.config.RepositoryRestConfigurer
 import org.springframework.jdbc.datasource.DriverManagerDataSource
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter
+import org.springframework.validation.Validator
+import phil.poc.pricingEngine.projections.CustomerProduct
 import java.util.*
 import javax.sql.DataSource
 
@@ -25,7 +29,8 @@ class DbConfig{
     @Bean
     fun dataSource(): DataSource{
         val dataSource = DriverManagerDataSource()
-        dataSource.setDriverClassName(env.getProperty("driverClassName"))
+        val driverClassNameVal: String = env.getProperty("driverClassName")
+        dataSource.setDriverClassName(driverClassNameVal)
         dataSource.url = env.getProperty("url")
         dataSource.username = env.getProperty("user")
         dataSource.password = env.getProperty("password")
@@ -60,14 +65,43 @@ class DbConfig{
 
 @Configuration
 @Profile("sqlite")
-@PropertySource("classpath:application.properties")
+@PropertySource("classpath:persistence-sqlite.properties")
 class SqliteConfig
 
 @Configuration
 class RestConfig: RepositoryRestConfigurer{
 
     override fun configureRepositoryRestConfiguration(repositoryRestConfiguration: RepositoryRestConfiguration) {
-        //repositoryRestConfiguration.projectionConfiguration.addProjection(CustomerProduct::class)
-        val conf = repositoryRestConfiguration.getExposureConfiguration();
+        repositoryRestConfiguration.projectionConfiguration.addProjection(CustomerProduct::class.java)
+    }
+}
+
+@Configuration
+class ValidatorEventRegister : InitializingBean {
+
+    @Autowired
+    internal var validatingRepositoryEventListener: ValidatingRepositoryEventListener? = null
+
+    @Autowired
+    private val validators: Map<String, Validator>? = null
+
+    @Throws(Exception::class)
+    override fun afterPropertiesSet() {
+        val events = Arrays.asList(
+            "beforeCreate",
+            "afterCreate",
+            "beforeSave",
+            "afterSave",
+            "beforeLinkSave",
+            "afterLinkSave",
+            "beforeDelete",
+            "afterDelete"
+        )
+
+        for ((key, value) in validators!!) {
+            events.stream().filter { p -> key.startsWith(p) }.findFirst().ifPresent { p ->
+                validatingRepositoryEventListener!!.addValidator(p, value)
+            }
+        }
     }
 }

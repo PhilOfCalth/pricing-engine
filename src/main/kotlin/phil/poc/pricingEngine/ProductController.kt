@@ -1,4 +1,4 @@
-package phil.poc.pricingEngine
+package phil.poc.pricingEngine.controller
 
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController

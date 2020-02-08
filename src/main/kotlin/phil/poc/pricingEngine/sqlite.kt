@@ -30,6 +30,24 @@ class SQLiteDialect(): Dialect() {
         registerColumnType(Types.CLOB, "clob")
         registerColumnType(Types.BOOLEAN, "integer")
     }
+
+    override fun getIdentityColumnSupport() = SQLiteIdentityColumnSupport()
+    override fun hasAlterTable() = false
+    override fun dropConstraints() = false
+    override fun getDropForeignKeyString() = ""
+    override fun getAddForeignKeyConstraintString(
+        constraintName: String?,
+        foreignKey: Array<String>,
+        referencedTable: String?,
+        primaryKey: Array<String>,
+        referencesPrimaryKey: Boolean
+    ) =  ""
+    override fun getAddPrimaryKeyConstraintString(constraintName: String?) = ""
+    override fun getForUpdateString() = ""
+    override fun getAddColumnString() =  "add column"
+    override fun supportsOuterJoinForUpdate() =  false
+    override fun supportsIfExistsBeforeTableName() =  true
+    override fun supportsCascadeDelete() = false
 }
 
 class SQLiteIdentityColumnSupport: IdentityColumnSupportImpl() {

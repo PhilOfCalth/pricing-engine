@@ -10,10 +10,11 @@ class Product(
     var id: Long,
     @Column(nullable = false)
     var name: String,
-    var description: String,
-    var rrp: Int,
-    @Column(nullable = false)
-    var wantedPrice: Int,
-    @Column(nullable = false)
-    var minPrice: Int){
+    var description: String?,
+    var rrp: Int?,
+    @Column(name="wanted_price", nullable = false)
+    var wantedPrice: Int?,
+    @Column(name="min_price", nullable = false)
+    var minPrice: Int?
+){
 }
